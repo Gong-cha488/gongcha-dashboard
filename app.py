@@ -158,7 +158,8 @@ with col_logout:
 st.markdown("---")
 
 # Sidebar
-st.sidebar.image("logo.png" if os.path.exists("logo.png") else "", use_column_width=True)
+if os.path.exists("logo.png"):
+    st.sidebar.image("logo.png", use_container_width=True)
 st.sidebar.markdown("---")
 st.sidebar.title("🔍 Filtres")
 
