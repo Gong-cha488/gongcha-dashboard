@@ -1,0 +1,19 @@
+credentials:
+  usernames:
+    admin:
+      email: tomasxwh@gmail.com
+      name: Admin Gong cha
+      password: "$2b$12$avmtfCW0eVc2FpnXyjSpauORLWbZLq9QJmxg/TJzH7AtEvWk8nvKq"
+    franchisé_fr:
+      email: franchise.france@gongcha.fr
+      name: Franchisé France
+      password: "$2b$12$kufkDEpX4WDZO0WLRRTFkefOLIOEufJ1.alUd.BR9Q03n5/jS.GAW"
+    franchisé_be:
+      email: franchise.belgique@gongcha.be
+      name: Franchisé Belgique
+      password: "$2b$12$X7sYoNQzWokqsCiCweU7D./TuTlv8QbclPtG8zV9fHp8iIOwi02si"
+
+cookie:
+  expiry_days: 30
+  key: gongcha_super_secret_key_2026
+  name: gongcha_auth_cookie
