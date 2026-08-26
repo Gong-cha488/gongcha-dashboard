@@ -197,7 +197,11 @@ def generate_ai_response(comment, sentiment, store_name):
 
     try:
         resp = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key,
+            },
             json={"contents": [{"parts": [{"text": prompt}]}]},
             timeout=15,
         )
@@ -205,7 +209,8 @@ def generate_ai_response(comment, sentiment, store_name):
         data = resp.json()
         text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
         return text
-    except Exception:
+    except Exception as e:
+        st.error(f"Erreur Gemini : {e}")
         return None
 
 
