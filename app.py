@@ -18,29 +18,64 @@ st.set_page_config(
 # ─── Branding CSS ────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Brand colors */
-    :root {
-        --gc-brown: #3d2b1f;
-        --gc-red:   #c8102e;
+    @import url('https://fonts.googleapis.com/css2?family=Vidaloka&family=Poppins:wght@400;500;600&display=swap');
+
+    html, body, [class*="css"], .stApp {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
     }
-    .stApp { background-color: #fafafa; }
-    header[data-testid="stHeader"] { background-color: #ffffff; border-bottom: 2px solid #c8102e; }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Vidaloka', serif !important;
+        color: #000000 !important;
+    }
+    p, span, div, label, li {
+        font-family: 'Poppins', sans-serif !important;
+        color: #000000 !important;
+    }
+    header[data-testid="stHeader"] {
+        background-color: #ffffff !important;
+        border-bottom: 2px solid #c8102e;
+    }
+    section[data-testid="stSidebar"] {
+        background-color: #f8f8f8 !important;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
     .stButton > button {
-        background-color: #c8102e;
-        color: white;
+        background-color: #c8102e !important;
+        color: #ffffff !important;
         border: none;
         border-radius: 6px;
+        font-family: 'Poppins', sans-serif !important;
     }
-    .stButton > button:hover { background-color: #a00d24; color: white; }
-    .metric-card {
-        background: white;
-        border-radius: 10px;
-        padding: 16px 20px;
-        border-left: 4px solid #c8102e;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    .stButton > button:hover {
+        background-color: #a00d24 !important;
+        color: #ffffff !important;
     }
-    .sidebar .sidebar-content { background-color: #3d2b1f; }
-    h1, h2, h3 { color: #3d2b1f; }
+    .stTabs [data-baseweb="tab"] {
+        font-family: 'Poppins', sans-serif !important;
+        color: #000000 !important;
+    }
+    .stMetric label, .stMetric [data-testid="stMetricValue"] {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stSelectbox label, .stSlider label {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    [data-testid="stExpander"] summary {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stTextArea textarea {
+        font-family: 'Poppins', sans-serif !important;
+        color: #000000 !important;
+    }
+    hr { border-color: #eeeeee; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -203,7 +238,7 @@ with tab1:
         fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
                      color="Note", color_continuous_scale=["#c8102e","#f39c12","#2ecc71"],
                      range_color=[1,5], range_x=[0,5])
-        fig.update_layout(height=360, coloraxis_showscale=False, margin=dict(l=0,r=0,t=10,b=0))
+        fig.update_layout(height=360, coloraxis_showscale=False, margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
         st.plotly_chart(fig, use_container_width=True)
 
     with c2:
@@ -213,7 +248,7 @@ with tab1:
         cmap = {"Positif":"#2ecc71","Neutre":"#f39c12","Négatif":"#c8102e"}
         fig = px.pie(sc, values="Nombre", names="Sentiment",
                      color="Sentiment", color_discrete_map=cmap, hole=0.4)
-        fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0))
+        fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
         st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("#### Évolution de la note dans le temps")
@@ -229,7 +264,7 @@ with tab1:
         monthly.columns = ["Mois","Note"]
         fig = px.line(monthly, x="Mois", y="Note", markers=True,
                       color_discrete_sequence=["#c8102e"])
-    fig.update_layout(height=360, yaxis_range=[0,5], margin=dict(l=0,r=0,t=10,b=0))
+    fig.update_layout(height=360, yaxis_range=[0,5], margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
