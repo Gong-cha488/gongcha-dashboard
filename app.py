@@ -8,6 +8,7 @@ import streamlit_authenticator as stauth
 import random
 import os
 import requests
+import html as html_lib
 
 # ─── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -517,32 +518,26 @@ with tab2:
 
         sent_color = sentiment_colors.get(row["sentiment"], "#888")
         sent_label = sentiment_labels.get(row["sentiment"], "")
-        replied_badge = '<span style="background:#2ecc71;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px">✓ Répondu</span>' if saved_response else ''
+        replied_badge = ' &nbsp;<span style="background:#2ecc71;color:white;padding:2px 8px;border-radius:10px;font-size:11px">&#10003; Répondu</span>' if saved_response else ''
+        store_name_safe = html_lib.escape(str(row['store_name']))
+        author_safe     = html_lib.escape(str(row['author']))
+        comment_safe    = html_lib.escape(str(row['comment']))
 
-        card_html = f"""
-        <div style="
-            border: 1px solid #eeeeee;
-            border-left: 4px solid {sent_color};
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        ">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <div>
-                    <span style="font-weight:600;color:#000;font-size:14px">{row['store_name']}</span>
-                    <span style="margin:0 8px">{stars_html}</span>
-                    <span style="color:#888;font-size:13px">{row['author']}</span>
-                    <span style="color:#aaa;font-size:12px;margin-left:8px">{row['date'].strftime('%d/%m/%Y')}</span>
-                    {replied_badge}
-                </div>
-                <span style="background:{sent_color}22;color:{sent_color};padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">{sent_label}</span>
-            </div>
-            <div style="margin-top:8px;color:#333;font-size:13px;font-style:italic">"{row['comment']}"</div>
-        </div>
-        """
-        st.markdown(card_html, unsafe_allow_html=True)
+        header_html = (
+            f'<div style="border:1px solid #eee;border-left:4px solid {sent_color};border-radius:8px;'
+            f'padding:12px 16px;margin-bottom:4px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+            f'<div><b>{store_name_safe}</b>&nbsp;&nbsp;{stars_html}&nbsp;&nbsp;'
+            f'<span style="color:#888;font-size:13px">{author_safe}</span>&nbsp;'
+            f'<span style="color:#aaa;font-size:12px">{row["date"].strftime("%d/%m/%Y")}</span>'
+            f'{replied_badge}</div>'
+            f'<span style="background:{sent_color}22;color:{sent_color};padding:2px 10px;'
+            f'border-radius:10px;font-size:12px;font-weight:600">{sent_label}</span>'
+            f'</div>'
+            f'<div style="margin-top:6px;color:#444;font-size:13px;font-style:italic">&ldquo;{comment_safe}&rdquo;</div>'
+            f'</div>'
+        )
+        st.markdown(header_html, unsafe_allow_html=True)
 
         btn_label = "▲ Fermer" if card_open else ("✏️ Modifier la réponse" if saved_response else "💬 Répondre")
         if st.button(btn_label, key=f"toggle_{i}"):
