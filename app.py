@@ -203,14 +203,12 @@ def generate_ai_response(comment, sentiment, store_name):
             timeout=30,
         )
         if resp.status_code != 200:
-            st.error(f"Erreur Gemini {resp.status_code} : {resp.text[:300]}")
-            return None
+            return None, f"Erreur {resp.status_code} : {resp.text[:300]}"
         data = resp.json()
         text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        return text
+        return text, None
     except Exception as e:
-        st.error(f"Erreur Gemini : {e}")
-        return None
+        return None, str(e)
 
 
 # ─── Google API helpers ───────────────────────────────────────────────────────
@@ -609,11 +607,12 @@ with tab2:
             ai_key = f"ai_draft_{idx}"
             if st.button("✨ Générer une réponse avec l'IA", key=f"ai_{i}"):
                 with st.spinner("Génération en cours..."):
-                    draft = generate_ai_response(row["comment"], row["sentiment"], row["store_name"])
+                    draft, err = generate_ai_response(row["comment"], row["sentiment"], row["store_name"])
                 if draft:
                     st.session_state[ai_key] = draft
+                    st.rerun()
                 else:
-                    st.warning("Impossible de contacter l'IA. Vérifiez la clé Gemini dans les secrets.")
+                    st.error(f"Erreur IA : {err}")
 
             default_text = st.session_state.get(ai_key, saved_response)
             response_text = st.text_area(
