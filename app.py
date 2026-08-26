@@ -7,6 +7,7 @@ from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 import random
 import os
+import requests
 
 # ─── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -55,9 +56,37 @@ st.markdown("""
         background-color: #a00d24 !important;
         color: #ffffff !important;
     }
+    /* ── Onglets ── */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        border-bottom: 2px solid #eeeeee;
+    }
     .stTabs [data-baseweb="tab"] {
         font-family: 'Poppins', sans-serif !important;
-        color: #000000 !important;
+        font-weight: 500 !important;
+        color: #555555 !important;
+        background-color: transparent !important;
+        border: 2px solid transparent !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 8px 20px !important;
+        transition: all 0.2s ease !important;
+        position: relative;
+        bottom: -2px;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #c8102e !important;
+        border-color: #c8102e !important;
+        background-color: #fff5f5 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #c8102e !important;
+        border-color: #c8102e !important;
+        border-bottom-color: #ffffff !important;
+        background-color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+    .stTabs [data-baseweb="tab-highlight"] {
+        display: none !important;
     }
     .stMetric label, .stMetric [data-testid="stMetricValue"] {
         color: #000000 !important;
@@ -67,7 +96,6 @@ st.markdown("""
         color: #000000 !important;
         font-family: 'Poppins', sans-serif !important;
     }
-    /* Dropdowns */
     .stSelectbox > div > div {
         background-color: #ffffff !important;
         color: #000000 !important;
@@ -111,14 +139,14 @@ st.markdown("""
 
 # ─── Stores ─────────────────────────────────────────────────────────────────
 STORES = {
-    "FR001": {"name": "Gong cha Mouffetard – Paris V",       "country": "France",   "location_id": "01705875247679560607"},
-    "FR002": {"name": "Gong cha Place d'Italie – Paris XIII","country": "France",   "location_id": "15591641451818809160"},
-    "FR003": {"name": "Gong cha Paris Rambuteau",            "country": "France",   "location_id": "04393882467532873946"},
-    "FR004": {"name": "Gong cha Angers",                     "country": "France",   "location_id": "13804649806498896511"},
-    "FR005": {"name": "Gong cha Toulouse",                   "country": "France",   "location_id": "09057985996391839636"},
-    "BE001": {"name": "Gong cha The Mint – Bruxelles",       "country": "Belgique", "location_id": "02421871038781132236"},
-    "BE002": {"name": "Gong cha Charleroi Ville 2",          "country": "Belgique", "location_id": "10189574050012545821"},
-    "BE003": {"name": "Gong cha Mons",                       "country": "Belgique", "location_id": "16874631373780109329"},
+    "FR001": {"name": "Gong cha Mouffetard – Paris V",        "country": "France",   "location_id": "01705875247679560607"},
+    "FR002": {"name": "Gong cha Place d'Italie – Paris XIII", "country": "France",   "location_id": "15591641451818809160"},
+    "FR003": {"name": "Gong cha Paris Rambuteau",             "country": "France",   "location_id": "04393882467532873946"},
+    "FR004": {"name": "Gong cha Angers",                      "country": "France",   "location_id": "13804649806498896511"},
+    "FR005": {"name": "Gong cha Toulouse",                    "country": "France",   "location_id": "09057985996391839636"},
+    "BE001": {"name": "Gong cha The Mint – Bruxelles",        "country": "Belgique", "location_id": "02421871038781132236"},
+    "BE002": {"name": "Gong cha Charleroi Ville 2",           "country": "Belgique", "location_id": "10189574050012545821"},
+    "BE003": {"name": "Gong cha Mons",                        "country": "Belgique", "location_id": "16874631373780109329"},
 }
 
 USER_STORES = {
@@ -127,7 +155,103 @@ USER_STORES = {
     "franchisé_be": ["BE001","BE002","BE003"],
 }
 
-# ─── Mock data ───────────────────────────────────────────────────────────────
+# ─── Google API helpers ───────────────────────────────────────────────────────
+def get_access_token():
+    """Exchange refresh token for access token."""
+    try:
+        creds = st.secrets["google"]
+        resp = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id":     creds["client_id"],
+                "client_secret": creds["client_secret"],
+                "refresh_token": creds["refresh_token"],
+                "grant_type":    "refresh_token",
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("access_token")
+    except Exception:
+        return None
+
+
+def get_account_id(access_token):
+    """Fetch the first Google Business account ID."""
+    try:
+        resp = requests.get(
+            "https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        accounts = resp.json().get("accounts", [])
+        if accounts:
+            # resource name like "accounts/123456789"
+            return accounts[0]["name"]
+        return None
+    except Exception:
+        return None
+
+
+@st.cache_data(ttl=1800)
+def fetch_reviews_from_api(account_name, location_id, access_token):
+    """Fetch reviews for one location from Google Business Profile API."""
+    try:
+        url = f"https://mybusiness.googleapis.com/v4/{account_name}/locations/{location_id}/reviews"
+        reviews = []
+        page_token = None
+        while True:
+            params = {"pageSize": 50}
+            if page_token:
+                params["pageToken"] = page_token
+            resp = requests.get(
+                url,
+                headers={"Authorization": f"Bearer {access_token}"},
+                params=params,
+                timeout=15,
+            )
+            if resp.status_code != 200:
+                break
+            data = resp.json()
+            reviews.extend(data.get("reviews", []))
+            page_token = data.get("nextPageToken")
+            if not page_token:
+                break
+        return reviews
+    except Exception:
+        return []
+
+
+def reply_to_review(account_name, location_id, review_id, reply_text, access_token):
+    """Post a reply to a Google review."""
+    url = f"https://mybusiness.googleapis.com/v4/{account_name}/locations/{location_id}/reviews/{review_id}/reply"
+    resp = requests.put(
+        url,
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        },
+        json={"comment": reply_text},
+        timeout=15,
+    )
+    return resp.status_code == 200
+
+
+def star_to_int(star_rating):
+    mapping = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5}
+    return mapping.get(star_rating, 3)
+
+
+def sentiment_from_rating(rating):
+    if rating >= 4:
+        return "Positif"
+    elif rating <= 2:
+        return "Négatif"
+    return "Neutre"
+
+
+# ─── Mock data (fallback) ────────────────────────────────────────────────────
 @st.cache_data(ttl=3600)
 def get_mock_data():
     random.seed(42)
@@ -173,8 +297,55 @@ def get_mock_data():
                 "sentiment":  sentiment,
                 "author":     f"Utilisateur{random.randint(100,999)}",
                 "response":   "",
+                "review_id":  "",
             })
     return pd.DataFrame(rows)
+
+
+def load_real_data(stores_to_load):
+    """Try to load real data from API; return (df, is_real)."""
+    token = get_access_token()
+    if not token:
+        return get_mock_data(), False
+
+    account = get_account_id(token)
+    if not account:
+        return get_mock_data(), False
+
+    rows = []
+    for store_id, store in stores_to_load.items():
+        reviews = fetch_reviews_from_api(account, store["location_id"], token)
+        for r in reviews:
+            rating = star_to_int(r.get("starRating", "THREE"))
+            comment = r.get("comment", "")
+            author  = r.get("reviewer", {}).get("displayName", "Anonyme")
+            create_time = r.get("createTime", "")
+            try:
+                date = datetime.fromisoformat(create_time.replace("Z", "+00:00"))
+            except Exception:
+                date = datetime.now()
+            reply = r.get("reviewReply", {}).get("comment", "")
+            review_id = r.get("reviewId", "")
+            rows.append({
+                "store_id":   store_id,
+                "store_name": store["name"],
+                "country":    store["country"],
+                "date":       date,
+                "rating":     rating,
+                "comment":    comment,
+                "sentiment":  sentiment_from_rating(rating),
+                "author":     author,
+                "response":   reply,
+                "review_id":  review_id,
+                "_account":   account,
+                "_location":  store["location_id"],
+                "_token":     token,
+            })
+
+    if rows:
+        return pd.DataFrame(rows), True
+    return get_mock_data(), False
+
 
 # ─── Authentication ───────────────────────────────────────────────────────────
 with open("users.yaml") as f:
@@ -236,12 +407,17 @@ if sel_country != "Tous":
 store_names = ["Tous"] + [v["name"] for v in filtered_stores.values()]
 sel_store = st.sidebar.selectbox("Magasin", store_names)
 
-st.sidebar.markdown("---")
-st.sidebar.info("📊 Données de démonstration\n\nConnectez l'API Google pour les données réelles.")
+# Load data
+with st.spinner("Chargement des avis..."):
+    df_all, is_real = load_real_data(user_stores)
 
-# Data
-df = get_mock_data()
-df_f = df[df["store_id"].isin(list(filtered_stores.keys()))].copy()
+if is_real:
+    st.sidebar.success("✅ Données réelles Google")
+else:
+    st.sidebar.info("📊 Données de démonstration\n\nVérifiez vos secrets API pour les données réelles.")
+
+# Filter
+df_f = df_all[df_all["store_id"].isin(list(filtered_stores.keys()))].copy()
 if sel_store != "Tous":
     df_f = df_f[df_f["store_name"] == sel_store]
 
@@ -249,7 +425,6 @@ if sel_store != "Tous":
 tab1, tab2 = st.tabs(["📊 Tableau de bord", "💬 Répondre aux avis"])
 
 with tab1:
-    # KPIs
     k1, k2, k3, k4 = st.columns(4)
     k1.metric("⭐ Note moyenne",  f"{df_f['rating'].mean():.2f} / 5")
     k2.metric("💬 Total avis",    f"{len(df_f)}")
@@ -266,7 +441,9 @@ with tab1:
         fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
                      color="Note", color_continuous_scale=["#c8102e","#f39c12","#2ecc71"],
                      range_color=[1,5], range_x=[0,5])
-        fig.update_layout(height=360, coloraxis_showscale=False, margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
+        fig.update_layout(height=360, coloraxis_showscale=False,
+                          margin=dict(l=0,r=0,t=10,b=0),
+                          paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
         st.plotly_chart(fig, use_container_width=True)
 
     with c2:
@@ -276,7 +453,8 @@ with tab1:
         cmap = {"Positif":"#2ecc71","Neutre":"#f39c12","Négatif":"#c8102e"}
         fig = px.pie(sc, values="Nombre", names="Sentiment",
                      color="Sentiment", color_discrete_map=cmap, hole=0.4)
-        fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
+        fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0),
+                          paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
         st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("#### Évolution de la note dans le temps")
@@ -292,14 +470,18 @@ with tab1:
         monthly.columns = ["Mois","Note"]
         fig = px.line(monthly, x="Mois", y="Note", markers=True,
                       color_discrete_sequence=["#c8102e"])
-    fig.update_layout(height=360, yaxis_range=[0,5], margin=dict(l=0,r=0,t=10,b=0), paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
+    fig.update_layout(height=360, yaxis_range=[0,5],
+                      margin=dict(l=0,r=0,t=10,b=0),
+                      paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     st.markdown("#### Répondre aux avis")
-    st.info("Les réponses seront publiées directement sur Google Business Profile une fois l'API connectée.")
+    if is_real:
+        st.success("✅ Les réponses seront publiées directement sur Google Business Profile.")
+    else:
+        st.info("Les réponses seront publiées sur Google une fois l'API connectée.")
 
-    # Filters for this tab
     col_f1, col_f2 = st.columns(2)
     with col_f1:
         filter_sentiment = st.selectbox("Filtrer par sentiment", ["Tous","Négatif","Neutre","Positif"])
@@ -314,22 +496,23 @@ with tab2:
     elif filter_responded == "Avec réponse":
         df_reply = df_reply[df_reply["response"] != ""]
 
-    # Initialize responses in session state
     if "responses" not in st.session_state:
         st.session_state.responses = {}
 
     for i, (idx, row) in enumerate(df_reply.head(30).iterrows()):
-        stars = "⭐" * int(row["rating"])
-        sentiment_color = {"Positif":"🟢","Neutre":"🟡","Négatif":"🔴"}.get(row["sentiment"],"⚪")
+        stars = "★" * int(row["rating"]) + "☆" * (5 - int(row["rating"]))
+        sentiment_tag = {"Positif":"[+]","Neutre":"[~]","Négatif":"[-]"}.get(row["sentiment"],"[ ]")
+        status_tag = " ✓" if row.get("response") or st.session_state.responses.get(f"response_{idx}") else ""
+        label = f"{sentiment_tag} {row['store_name']}  {stars}  {row['author']}  {row['date'].strftime('%d/%m/%Y')}{status_tag}"
 
-        with st.expander(f"{sentiment_color} {row['store_name']} — {stars} — {row['author']} ({row['date'].strftime('%d/%m/%Y')})"):
+        with st.expander(label):
             st.markdown(f"**Commentaire :** {row['comment']}")
 
             response_key = f"response_{idx}"
-            saved_response = st.session_state.responses.get(response_key, "")
+            saved_response = st.session_state.responses.get(response_key, row.get("response",""))
 
             if saved_response:
-                st.success(f"✅ Réponse envoyée : *{saved_response}*")
+                st.success(f"✅ Réponse publiée : *{saved_response}*")
                 if st.button("Modifier", key=f"edit_{i}"):
                     del st.session_state.responses[response_key]
                     st.rerun()
@@ -342,8 +525,22 @@ with tab2:
                 )
                 if st.button("📤 Envoyer la réponse", key=f"send_{i}"):
                     if response_text.strip():
-                        st.session_state.responses[response_key] = response_text
-                        st.success("✅ Réponse enregistrée ! (sera publiée sur Google une fois l'API connectée)")
-                        st.rerun()
+                        success = False
+                        if is_real and row.get("review_id") and row.get("_token"):
+                            success = reply_to_review(
+                                row["_account"],
+                                row["_location"],
+                                row["review_id"],
+                                response_text,
+                                row["_token"],
+                            )
+                        else:
+                            success = True  # mock mode
+                        if success:
+                            st.session_state.responses[response_key] = response_text
+                            st.success("✅ Réponse publiée sur Google !" if is_real else "✅ Réponse enregistrée !")
+                            st.rerun()
+                        else:
+                            st.error("Erreur lors de l'envoi. Veuillez réessayer.")
                     else:
                         st.warning("Veuillez écrire une réponse avant d'envoyer.")
