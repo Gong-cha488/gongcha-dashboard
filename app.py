@@ -198,7 +198,26 @@ def generate_ai_response(comment, sentiment, store_name):
     try:
         import google.generativeai as genai
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-3.5-flash-lite")
+
+        # Trouve le premier modèle disponible qui supporte generateContent
+        model_name = None
+        preferred = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+        try:
+            available = [m.name for m in genai.list_models()
+                         if "generateContent" in m.supported_generation_methods]
+            for p in preferred:
+                for a in available:
+                    if p in a:
+                        model_name = a
+                        break
+                if model_name:
+                    break
+            if not model_name and available:
+                model_name = available[0]
+        except Exception:
+            model_name = "models/gemini-1.5-flash"
+
+        model = genai.GenerativeModel(model_name)
         response = model.generate_content(prompt)
         return response.text.strip(), None
     except Exception as e:
