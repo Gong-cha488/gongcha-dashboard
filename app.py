@@ -196,19 +196,13 @@ def generate_ai_response(comment, sentiment, store_name):
     )
 
     try:
-        resp = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={api_key}",
-            headers={"Content-Type": "application/json"},
-            json={"contents": [{"parts": [{"text": prompt}]}]},
-            timeout=30,
-        )
-        if resp.status_code != 200:
-            return None, f"Erreur {resp.status_code} : {resp.text[:300]}"
-        data = resp.json()
-        text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        return text, None
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
+        response = model.generate_content(prompt)
+        return response.text.strip(), None
     except Exception as e:
-        return None, str(e)
+        return None, f"{type(e).__name__}: {e}"
 
 
 # ─── Google API helpers ───────────────────────────────────────────────────────
