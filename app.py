@@ -199,20 +199,16 @@ def generate_ai_response(comment, sentiment, store_name):
         import google.generativeai as genai
         genai.configure(api_key=api_key)
 
-        # Trouve le premier modèle disponible qui supporte generateContent
+        # Trouve le premier modèle Flash disponible (gratuit)
         model_name = None
-        preferred = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
         try:
             available = [m.name for m in genai.list_models()
                          if "generateContent" in m.supported_generation_methods]
-            for p in preferred:
-                for a in available:
-                    if p in a:
-                        model_name = a
-                        break
-                if model_name:
-                    break
-            if not model_name and available:
+            # Préférer flash, éviter pro (payant)
+            flash_models = [m for m in available if "flash" in m.lower() and "pro" not in m.lower()]
+            if flash_models:
+                model_name = flash_models[0]
+            elif available:
                 model_name = available[0]
         except Exception:
             model_name = "models/gemini-1.5-flash"
