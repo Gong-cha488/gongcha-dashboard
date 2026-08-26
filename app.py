@@ -156,6 +156,59 @@ USER_STORES = {
     "franchisé_be": ["BE001","BE002","BE003"],
 }
 
+# ─── Gemini AI helper ────────────────────────────────────────────────────────
+def generate_ai_response(comment, sentiment, store_name):
+    """Generate a review response using Gemini API."""
+    try:
+        api_key = st.secrets["gemini"]["api_key"]
+    except Exception:
+        return None
+
+    tone_instructions = {
+        "Positif": (
+            "Ton chaleureux, enthousiaste et reconnaissant. "
+            "Remercie sincèrement le client et invite-le à revenir."
+        ),
+        "Neutre": (
+            "Ton professionnel et courtois. "
+            "Remercie le client et propose-lui de découvrir d'autres saveurs."
+        ),
+        "Négatif": (
+            "Ton empathique, compréhensif et solution-focused. "
+            "Excuse-toi sincèrement, reconnaît le problème et propose une solution concrète."
+        ),
+    }
+    tone = tone_instructions.get(sentiment, tone_instructions["Neutre"])
+
+    seo_keywords = (
+        "bubble tea, boba, thé tapioca, perles de tapioca, Gong cha, "
+        "thé premium, boisson artisanale, milk tea, fruit tea"
+    )
+
+    prompt = (
+        f"Tu es le responsable du {store_name}, enseigne Gong cha de bubble tea.\n"
+        f"Rédige une réponse à cet avis Google en français (3-4 phrases max).\n\n"
+        f"Avis du client : \"{comment}\"\n\n"
+        f"Consignes de ton : {tone}\n"
+        f"Intègre naturellement 1-2 mots-clés SEO parmi : {seo_keywords}\n"
+        f"Signe avec 'L'équipe {store_name}'.\n"
+        f"Réponse :"
+    )
+
+    try:
+        resp = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}",
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        return text
+    except Exception:
+        return None
+
+
 # ─── Google API helpers ───────────────────────────────────────────────────────
 def get_access_token():
     """Exchange refresh token for access token."""
@@ -547,12 +600,24 @@ with tab2:
         if card_open:
             if saved_response:
                 st.success(f"Réponse publiée : *{saved_response}*")
+
+            # AI generation
+            ai_key = f"ai_draft_{idx}"
+            if st.button("✨ Générer une réponse avec l'IA", key=f"ai_{i}"):
+                with st.spinner("Génération en cours..."):
+                    draft = generate_ai_response(row["comment"], row["sentiment"], row["store_name"])
+                if draft:
+                    st.session_state[ai_key] = draft
+                else:
+                    st.warning("Impossible de contacter l'IA. Vérifiez la clé Gemini dans les secrets.")
+
+            default_text = st.session_state.get(ai_key, saved_response)
             response_text = st.text_area(
                 "Votre réponse",
-                value=saved_response,
+                value=default_text,
                 placeholder="Bonjour, merci pour votre avis...",
                 key=f"text_{i}",
-                height=100,
+                height=120,
             )
             col_send, col_cancel = st.columns([2, 1])
             with col_send:
