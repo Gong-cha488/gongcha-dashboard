@@ -81,21 +81,19 @@ st.markdown("""
 
 # ─── Stores ─────────────────────────────────────────────────────────────────
 STORES = {
-    "FR001": {"name": "Gong cha Paris Opéra",  "country": "France",   "location_id": ""},
-    "FR002": {"name": "Gong cha Paris Marais",  "country": "France",   "location_id": ""},
-    "FR003": {"name": "Gong cha Lyon",           "country": "France",   "location_id": ""},
-    "FR004": {"name": "Gong cha Bordeaux",       "country": "France",   "location_id": ""},
-    "FR005": {"name": "Gong cha Marseille",      "country": "France",   "location_id": ""},
-    "FR006": {"name": "Gong cha Toulouse",       "country": "France",   "location_id": ""},
-    "FR007": {"name": "Gong cha Lille",          "country": "France",   "location_id": ""},
-    "BE001": {"name": "Gong cha Bruxelles",      "country": "Belgique", "location_id": ""},
-    "BE002": {"name": "Gong cha Anvers",         "country": "Belgique", "location_id": ""},
-    "BE003": {"name": "Gong cha Gand",           "country": "Belgique", "location_id": ""},
+    "FR001": {"name": "Gong cha Mouffetard – Paris V",       "country": "France",   "location_id": "01705875247679560607"},
+    "FR002": {"name": "Gong cha Place d'Italie – Paris XIII","country": "France",   "location_id": "15591641451818809160"},
+    "FR003": {"name": "Gong cha Paris Rambuteau",            "country": "France",   "location_id": "04393882467532873946"},
+    "FR004": {"name": "Gong cha Angers",                     "country": "France",   "location_id": "13804649806498896511"},
+    "FR005": {"name": "Gong cha Toulouse",                   "country": "France",   "location_id": "09057985996391839636"},
+    "BE001": {"name": "Gong cha The Mint – Bruxelles",       "country": "Belgique", "location_id": "02421871038781132236"},
+    "BE002": {"name": "Gong cha Charleroi Ville 2",          "country": "Belgique", "location_id": "10189574050012545821"},
+    "BE003": {"name": "Gong cha Mons",                       "country": "Belgique", "location_id": "16874631373780109329"},
 }
 
 USER_STORES = {
     "admin":        list(STORES.keys()),
-    "franchisé_fr": ["FR001","FR002","FR003","FR004","FR005","FR006","FR007"],
+    "franchisé_fr": ["FR001","FR002","FR003","FR004","FR005"],
     "franchisé_be": ["BE001","BE002","BE003"],
 }
 
