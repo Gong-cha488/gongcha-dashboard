@@ -605,14 +605,18 @@ with tab2:
 
             # AI generation
             ai_key = f"ai_draft_{idx}"
+            ai_err_key = f"ai_err_{idx}"
             if st.button("✨ Générer une réponse avec l'IA", key=f"ai_{i}"):
                 with st.spinner("Génération en cours..."):
                     draft, err = generate_ai_response(row["comment"], row["sentiment"], row["store_name"])
                 if draft:
                     st.session_state[ai_key] = draft
-                    st.rerun()
+                    st.session_state.pop(ai_err_key, None)
                 else:
-                    st.error(f"Erreur IA : {err}")
+                    st.session_state[ai_err_key] = err or "Erreur inconnue"
+                st.rerun()
+            if st.session_state.get(ai_err_key):
+                st.error(f"Erreur IA : {st.session_state[ai_err_key]}")
 
             default_text = st.session_state.get(ai_key, saved_response)
             response_text = st.text_area(
