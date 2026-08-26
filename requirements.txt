@@ -5,6 +5,7 @@ plotly
 pillow>=11.0.0
 google-auth
 google-auth-oauthlib
+google-generativeai
 requests
 pyyaml
 bcrypt
