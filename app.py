@@ -498,32 +498,70 @@ with tab2:
 
     if "responses" not in st.session_state:
         st.session_state.responses = {}
+    if "open_cards" not in st.session_state:
+        st.session_state.open_cards = {}
+
+    sentiment_colors = {"Positif": "#2ecc71", "Neutre": "#f39c12", "Négatif": "#c8102e"}
+    sentiment_labels = {"Positif": "Positif", "Neutre": "Neutre", "Négatif": "Négatif"}
 
     for i, (idx, row) in enumerate(df_reply.head(30).iterrows()):
-        stars = "★" * int(row["rating"]) + "☆" * (5 - int(row["rating"]))
-        sentiment_tag = {"Positif":"[+]","Neutre":"[~]","Négatif":"[-]"}.get(row["sentiment"],"[ ]")
-        status_tag = " ✓" if row.get("response") or st.session_state.responses.get(f"response_{idx}") else ""
-        label = f"{sentiment_tag} {row['store_name']}  {stars}  {row['author']}  {row['date'].strftime('%d/%m/%Y')}{status_tag}"
+        stars_filled = int(row["rating"])
+        stars_html = "".join([
+            f'<span style="color:#f39c12;font-size:16px">★</span>' if j < stars_filled
+            else f'<span style="color:#cccccc;font-size:16px">★</span>'
+            for j in range(5)
+        ])
+        response_key = f"response_{idx}"
+        saved_response = st.session_state.responses.get(response_key, row.get("response", ""))
+        card_open = st.session_state.open_cards.get(response_key, False)
 
-        with st.expander(label):
-            st.markdown(f"**Commentaire :** {row['comment']}")
+        sent_color = sentiment_colors.get(row["sentiment"], "#888")
+        sent_label = sentiment_labels.get(row["sentiment"], "")
+        replied_badge = '<span style="background:#2ecc71;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px">✓ Répondu</span>' if saved_response else ''
 
-            response_key = f"response_{idx}"
-            saved_response = st.session_state.responses.get(response_key, row.get("response",""))
+        card_html = f"""
+        <div style="
+            border: 1px solid #eeeeee;
+            border-left: 4px solid {sent_color};
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        ">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div>
+                    <span style="font-weight:600;color:#000;font-size:14px">{row['store_name']}</span>
+                    <span style="margin:0 8px">{stars_html}</span>
+                    <span style="color:#888;font-size:13px">{row['author']}</span>
+                    <span style="color:#aaa;font-size:12px;margin-left:8px">{row['date'].strftime('%d/%m/%Y')}</span>
+                    {replied_badge}
+                </div>
+                <span style="background:{sent_color}22;color:{sent_color};padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">{sent_label}</span>
+            </div>
+            <div style="margin-top:8px;color:#333;font-size:13px;font-style:italic">"{row['comment']}"</div>
+        </div>
+        """
+        st.markdown(card_html, unsafe_allow_html=True)
 
+        btn_label = "▲ Fermer" if card_open else ("✏️ Modifier la réponse" if saved_response else "💬 Répondre")
+        if st.button(btn_label, key=f"toggle_{i}"):
+            st.session_state.open_cards[response_key] = not card_open
+            st.rerun()
+
+        if card_open:
             if saved_response:
-                st.success(f"✅ Réponse publiée : *{saved_response}*")
-                if st.button("Modifier", key=f"edit_{i}"):
-                    del st.session_state.responses[response_key]
-                    st.rerun()
-            else:
-                response_text = st.text_area(
-                    "Votre réponse",
-                    placeholder="Bonjour, merci pour votre avis...",
-                    key=f"text_{i}",
-                    height=100
-                )
-                if st.button("📤 Envoyer la réponse", key=f"send_{i}"):
+                st.success(f"Réponse publiée : *{saved_response}*")
+            response_text = st.text_area(
+                "Votre réponse",
+                value=saved_response,
+                placeholder="Bonjour, merci pour votre avis...",
+                key=f"text_{i}",
+                height=100,
+            )
+            col_send, col_cancel = st.columns([2, 1])
+            with col_send:
+                if st.button("📤 Envoyer la réponse", key=f"send_{i}", type="primary"):
                     if response_text.strip():
                         success = False
                         if is_real and row.get("review_id") and row.get("_token"):
@@ -535,12 +573,19 @@ with tab2:
                                 row["_token"],
                             )
                         else:
-                            success = True  # mock mode
+                            success = True
                         if success:
                             st.session_state.responses[response_key] = response_text
+                            st.session_state.open_cards[response_key] = False
                             st.success("✅ Réponse publiée sur Google !" if is_real else "✅ Réponse enregistrée !")
                             st.rerun()
                         else:
                             st.error("Erreur lors de l'envoi. Veuillez réessayer.")
                     else:
                         st.warning("Veuillez écrire une réponse avant d'envoyer.")
+            with col_cancel:
+                if st.button("Annuler", key=f"cancel_{i}"):
+                    st.session_state.open_cards[response_key] = False
+                    st.rerun()
+
+        st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
