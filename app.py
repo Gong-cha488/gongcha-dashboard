@@ -162,7 +162,7 @@ def generate_ai_response(comment, sentiment, store_name):
     try:
         api_key = st.secrets["gemini"]["api_key"]
     except Exception:
-        return None
+        return None, "Clé Gemini introuvable dans les secrets Streamlit."
 
     tone_instructions = {
         "Positif": (
