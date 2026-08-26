@@ -67,6 +67,36 @@ st.markdown("""
         color: #000000 !important;
         font-family: 'Poppins', sans-serif !important;
     }
+    /* Dropdowns */
+    .stSelectbox > div > div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+    }
+    .stSelectbox > div > div > div {
+        color: #000000 !important;
+    }
+    [data-baseweb="select"] {
+        background-color: #ffffff !important;
+    }
+    [data-baseweb="select"] * {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [data-baseweb="popover"] * {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [role="listbox"] {
+        background-color: #ffffff !important;
+    }
+    [role="option"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [role="option"]:hover {
+        background-color: #f5f5f5 !important;
+    }
     [data-testid="stExpander"] summary {
         color: #000000 !important;
         font-family: 'Poppins', sans-serif !important;
