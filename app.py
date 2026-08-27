@@ -606,6 +606,7 @@ with tab2:
                     draft, err = generate_ai_response(row["comment"], row["sentiment"], row["store_name"])
                 if draft:
                     st.session_state[ai_key] = draft
+                    st.session_state[f"text_{i}"] = draft  # injecte dans le textarea
                     st.session_state.pop(ai_err_key, None)
                 else:
                     st.session_state[ai_err_key] = err or "Erreur inconnue"
@@ -613,10 +614,11 @@ with tab2:
             if st.session_state.get(ai_err_key):
                 st.error(f"Erreur IA : {st.session_state[ai_err_key]}")
 
-            default_text = st.session_state.get(ai_key, saved_response)
+            # Initialise le textarea avec la réponse existante si pas encore défini
+            if f"text_{i}" not in st.session_state:
+                st.session_state[f"text_{i}"] = saved_response
             response_text = st.text_area(
                 "Votre réponse",
-                value=default_text,
                 placeholder="Bonjour, merci pour votre avis...",
                 key=f"text_{i}",
                 height=120,
