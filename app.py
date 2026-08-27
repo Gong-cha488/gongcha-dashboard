@@ -133,6 +133,14 @@ st.markdown("""
     .stTextArea textarea {
         font-family: 'Poppins', sans-serif !important;
         color: #000000 !important;
+        background-color: #ffffff !important;
+        border: 2px solid #c8102e !important;
+        border-radius: 6px !important;
+    }
+    .stTextArea textarea:focus {
+        border-color: #a00d24 !important;
+        box-shadow: 0 0 0 2px rgba(200,16,46,0.15) !important;
+        outline: none !important;
     }
     hr { border-color: #eeeeee; }
 </style>
@@ -201,7 +209,11 @@ def generate_ai_response(comment, sentiment, store_name):
 
         model = genai.GenerativeModel("models/gemini-3.6-flash")
         response = model.generate_content(prompt)
-        return response.text.strip(), None
+        text = response.text.strip()
+        # Supprimer le formatage markdown gras (**mot**)
+        import re
+        text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)
+        return text, None
     except Exception as e:
         return None, f"{type(e).__name__}: {e}"
 
