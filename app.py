@@ -239,6 +239,97 @@ def get_access_token():
         return None
 
 
+def test_api_connection():
+    """Test each step of the API connection and return a detailed report."""
+    results = []
+
+    # Step 1: Check secrets
+    try:
+        creds = st.secrets["google"]
+        has_client_id     = bool(creds.get("client_id"))
+        has_client_secret = bool(creds.get("client_secret"))
+        has_refresh_token = bool(creds.get("refresh_token"))
+        if has_client_id and has_client_secret and has_refresh_token:
+            results.append(("✅", "Secrets Streamlit", "client_id, client_secret, refresh_token trouvés"))
+        else:
+            missing = [k for k, v in [("client_id", has_client_id), ("client_secret", has_client_secret), ("refresh_token", has_refresh_token)] if not v]
+            results.append(("❌", "Secrets Streamlit", f"Manquants : {', '.join(missing)}"))
+            return results
+    except Exception as e:
+        results.append(("❌", "Secrets Streamlit", f"Section [google] introuvable : {e}"))
+        return results
+
+    # Step 2: Get access token
+    try:
+        resp = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id":     creds["client_id"],
+                "client_secret": creds["client_secret"],
+                "refresh_token": creds["refresh_token"],
+                "grant_type":    "refresh_token",
+            },
+            timeout=10,
+        )
+        data = resp.json()
+        if resp.status_code == 200 and "access_token" in data:
+            access_token = data["access_token"]
+            results.append(("✅", "Token OAuth", "Access token obtenu avec succès"))
+        else:
+            error_msg = data.get("error_description") or data.get("error") or str(data)
+            results.append(("❌", "Token OAuth", f"Échec ({resp.status_code}) : {error_msg}"))
+            return results
+    except Exception as e:
+        results.append(("❌", "Token OAuth", f"Erreur réseau : {e}"))
+        return results
+
+    # Step 3: Get account
+    try:
+        resp = requests.get(
+            "https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=10,
+        )
+        data = resp.json()
+        if resp.status_code == 200:
+            accounts = data.get("accounts", [])
+            if accounts:
+                account_name = accounts[0]["name"]
+                results.append(("✅", "Compte Google Business", f"Compte trouvé : {account_name}"))
+            else:
+                results.append(("⚠️", "Compte Google Business", "Aucun compte trouvé (vérifiez les droits du compte Google)"))
+                return results
+        else:
+            error_msg = data.get("error", {}).get("message") or str(data)
+            results.append(("❌", "Compte Google Business", f"Échec ({resp.status_code}) : {error_msg}"))
+            return results
+    except Exception as e:
+        results.append(("❌", "Compte Google Business", f"Erreur : {e}"))
+        return results
+
+    # Step 4: Fetch reviews for first store
+    try:
+        first_store = list(STORES.values())[0]
+        url = f"https://mybusiness.googleapis.com/v4/{account_name}/locations/{first_store['location_id']}/reviews"
+        resp = requests.get(
+            url,
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={"pageSize": 1},
+            timeout=10,
+        )
+        data = resp.json()
+        if resp.status_code == 200:
+            reviews = data.get("reviews", [])
+            results.append(("✅", "Avis Google", f"{len(reviews)} avis récupéré(s) pour {first_store['name']}"))
+        else:
+            error_msg = data.get("error", {}).get("message") or str(data)
+            results.append(("❌", "Avis Google", f"Échec ({resp.status_code}) : {error_msg}"))
+    except Exception as e:
+        results.append(("❌", "Avis Google", f"Erreur : {e}"))
+
+    return results
+
+
 def get_account_id(access_token):
     """Fetch the first Google Business account ID."""
     try:
@@ -457,6 +548,21 @@ st.markdown("---")
 # Sidebar
 if os.path.exists("logo.png"):
     st.sidebar.image("logo.png", use_container_width=True)
+st.sidebar.markdown("---")
+
+# Diagnostic API
+with st.sidebar.expander("🔧 Tester la connexion API"):
+    if st.button("▶ Lancer le diagnostic", key="diag_btn"):
+        with st.spinner("Test en cours..."):
+            diag_results = test_api_connection()
+        for icon, step, detail in diag_results:
+            if icon == "✅":
+                st.success(f"**{step}**\n\n{detail}")
+            elif icon == "❌":
+                st.error(f"**{step}**\n\n{detail}")
+            else:
+                st.warning(f"**{step}**\n\n{detail}")
+
 st.sidebar.markdown("---")
 st.sidebar.title("🔍 Filtres")
 
