@@ -20,202 +20,131 @@ st.set_page_config(
 # ─── Branding CSS ────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Vidaloka&family=Poppins:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Vidaloka&family=Poppins:wght@400;500;600&display=swap');
 
-:root {
-    --ink: #2B1B12;
-    --muted: #8A7A69;
-    --paper: #F7F4EF;
-    --surface: #FFFFFF;
-    --line: #ECE4D8;
-    --wine: #A81438;
-    --wine-dark: #7D0F2A;
-    --wine-light: #C8355B;
-    --gold: #C9A227;
-    --sage: #4C8C6B;
-    --rust: #B3492A;
-    --shadow: 0 4px 20px rgba(43,27,18,0.06);
-}
-
-html, body, [class*="css"], .stApp {
-    background-color: var(--paper) !important;
-    color: var(--ink) !important;
-    font-family: 'Poppins', sans-serif !important;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Vidaloka', serif !important;
-    color: var(--ink) !important;
-}
-
-p, span, div, label, li {
-    font-family: 'Poppins', sans-serif !important;
-    color: var(--ink) !important;
-}
-
-header[data-testid="stHeader"] {
-    background-color: var(--paper) !important;
-    border-bottom: none;
-}
-
-section[data-testid="stSidebar"] {
-    background: linear-gradient(160deg, var(--wine-dark) 0%, var(--wine) 55%, var(--wine-light) 100%) !important;
-    border-right: none;
-}
-section[data-testid="stSidebar"] * {
-    color: #FBEAEE !important;
-    font-family: 'Poppins', sans-serif !important;
-}
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    font-family: 'Vidaloka', serif !important;
-    color: #ffffff !important;
-}
-section[data-testid="stSidebar"] hr {
-    border-color: rgba(255,255,255,0.18) !important;
-}
-section[data-testid="stSidebar"] [data-baseweb="select"] > div {
-    background-color: rgba(255,255,255,0.12) !important;
-    border: 1px solid rgba(255,255,255,0.25) !important;
-    border-radius: 10px !important;
-}
-section[data-testid="stSidebar"] [data-baseweb="select"] * {
-    color: #ffffff !important;
-}
-section[data-testid="stSidebar"] [data-testid="stExpander"] {
-    background-color: rgba(255,255,255,0.08) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    border-radius: 12px !important;
-}
-section[data-testid="stSidebar"] .stButton > button {
-    background-color: rgba(255,255,255,0.15) !important;
-    border: 1px solid rgba(255,255,255,0.3) !important;
-    border-radius: 999px !important;
-}
-section[data-testid="stSidebar"] .stButton > button:hover {
-    background-color: rgba(255,255,255,0.28) !important;
-}
-
-.stButton > button {
-    background-color: var(--wine) !important;
-    color: #ffffff !important;
-    border: none;
-    border-radius: 999px !important;
-    padding: 8px 22px !important;
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600 !important;
-    box-shadow: var(--shadow);
-    transition: background-color 0.15s ease, transform 0.1s ease;
-}
-.stButton > button:hover {
-    background-color: var(--wine-dark) !important;
-    transform: translateY(-1px);
-}
-
-.stTabs [data-baseweb="tab-list"] {
-    gap: 6px;
-    background: var(--surface);
-    padding: 6px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    display: inline-flex;
-    box-shadow: var(--shadow);
-}
-.stTabs [data-baseweb="tab"] {
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600 !important;
-    color: var(--muted) !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 999px !important;
-    padding: 8px 20px !important;
-}
-.stTabs [aria-selected="true"] {
-    color: #ffffff !important;
-    background-color: var(--wine) !important;
-}
-.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
-
-.stSelectbox label, .stSlider label {
-    color: var(--ink) !important;
-    font-family: 'Poppins', sans-serif !important;
-}
-.stSelectbox > div > div {
-    background-color: var(--surface) !important;
-    color: var(--ink) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 10px !important;
-}
-[data-baseweb="select"] * { background-color: var(--surface) !important; color: var(--ink) !important; }
-[data-baseweb="popover"] * { background-color: var(--surface) !important; color: var(--ink) !important; }
-[role="option"]:hover { background-color: #FFF1F1 !important; }
-
-[data-testid="stExpander"] {
-    background-color: var(--surface) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 14px !important;
-    box-shadow: var(--shadow);
-}
-[data-testid="stExpander"] summary {
-    color: var(--ink) !important;
-    font-family: 'Poppins', sans-serif !important;
-}
-
-.stTextArea textarea {
-    font-family: 'Poppins', sans-serif !important;
-    color: var(--ink) !important;
-    background-color: var(--surface) !important;
-    border: 1.5px solid var(--line) !important;
-    border-radius: 12px !important;
-}
-.stTextArea textarea:focus {
-    border-color: var(--wine) !important;
-    box-shadow: 0 0 0 3px rgba(168,20,56,0.12) !important;
-    outline: none !important;
-}
-
-hr { border-color: var(--line); }
-
-.kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    height: 100%;
-}
-.kpi-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    margin-bottom: 12px;
-    color: #ffffff;
-}
-.kpi-card .kpi-label {
-    font-size: 12.5px;
-    color: var(--muted);
-    font-weight: 500;
-    margin-bottom: 2px;
-}
-.kpi-card .kpi-value {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 800;
-    font-size: 28px;
-    color: var(--ink);
-    line-height: 1.1;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 18px !important;
-}
+    html, body, [class*="css"], .stApp {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Vidaloka', serif !important;
+        color: #000000 !important;
+    }
+    p, span, div, label, li {
+        font-family: 'Poppins', sans-serif !important;
+        color: #000000 !important;
+    }
+    header[data-testid="stHeader"] {
+        background-color: #ffffff !important;
+        border-bottom: 2px solid #c8102e;
+    }
+    section[data-testid="stSidebar"] {
+        background-color: #f8f8f8 !important;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stButton > button {
+        background-color: #c8102e !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 6px;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stButton > button:hover {
+        background-color: #a00d24 !important;
+        color: #ffffff !important;
+    }
+    /* ── Onglets ── */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        border-bottom: 2px solid #eeeeee;
+    }
+    .stTabs [data-baseweb="tab"] {
+        font-family: 'Poppins', sans-serif !important;
+        font-weight: 500 !important;
+        color: #555555 !important;
+        background-color: transparent !important;
+        border: 2px solid transparent !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 8px 20px !important;
+        transition: all 0.2s ease !important;
+        position: relative;
+        bottom: -2px;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #c8102e !important;
+        border-color: #c8102e !important;
+        background-color: #fff5f5 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #c8102e !important;
+        border-color: #c8102e !important;
+        border-bottom-color: #ffffff !important;
+        background-color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+    .stTabs [data-baseweb="tab-highlight"] {
+        display: none !important;
+    }
+    .stMetric label, .stMetric [data-testid="stMetricValue"] {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stSelectbox label, .stSlider label {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stSelectbox > div > div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+    }
+    .stSelectbox > div > div > div {
+        color: #000000 !important;
+    }
+    [data-baseweb="select"] {
+        background-color: #ffffff !important;
+    }
+    [data-baseweb="select"] * {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [data-baseweb="popover"] * {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [role="listbox"] {
+        background-color: #ffffff !important;
+    }
+    [role="option"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    [role="option"]:hover {
+        background-color: #f5f5f5 !important;
+    }
+    [data-testid="stExpander"] summary {
+        color: #000000 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stTextArea textarea {
+        font-family: 'Poppins', sans-serif !important;
+        color: #000000 !important;
+        background-color: #ffffff !important;
+        border: 2px solid #c8102e !important;
+        border-radius: 6px !important;
+    }
+    .stTextArea textarea:focus {
+        border-color: #a00d24 !important;
+        box-shadow: 0 0 0 2px rgba(200,16,46,0.15) !important;
+        outline: none !important;
+    }
+    hr { border-color: #eeeeee; }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ─── Stores ─────────────────────────────────────────────────────────────────
 STORES = {
@@ -665,24 +594,11 @@ if sel_store != "Tous":
 tab1, tab2 = st.tabs(["📊 Tableau de bord", "💬 Répondre aux avis"])
 
 with tab1:
-    def kpi_card(icon, label, value, badge_color="#A81438"):
-        st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-icon" style="background:{badge_color}">{icon}</div>
-            <div class="kpi-label">{label}</div>
-            <div class="kpi-value">{value}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
     k1, k2, k3, k4 = st.columns(4)
-    with k1:
-        kpi_card("⭐", "Note moyenne", f"{df_f['rating'].mean():.2f} / 5", "#C9A227")
-    with k2:
-        kpi_card("💬", "Total avis", f"{len(df_f)}", "#A81438")
-    with k3:
-        kpi_card("😊", "Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%", "#4C8C6B")
-    with k4:
-        kpi_card("😞", "Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%", "#B3492A")
+    k1.metric("⭐ Note moyenne",  f"{df_f['rating'].mean():.2f} / 5")
+    k2.metric("💬 Total avis",    f"{len(df_f)}")
+    k3.metric("😊 Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%")
+    k4.metric("😞 Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%")
     st.markdown("---")
 
     c1, c2 = st.columns(2)
@@ -692,7 +608,7 @@ with tab1:
         sr.columns = ["Magasin", "Note"]
         sr = sr.sort_values("Note")
         fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
-                     color="Note", color_continuous_scale=["#B3492A","#C9A227","#4C8C6B"],
+                     color="Note", color_continuous_scale=["#c8102e","#f39c12","#2ecc71"],
                      range_color=[1,5], range_x=[0,5])
         fig.update_layout(height=360, coloraxis_showscale=False,
                           margin=dict(l=0,r=0,t=10,b=0),
@@ -703,7 +619,7 @@ with tab1:
         st.markdown("#### Répartition des sentiments")
         sc = df_f["sentiment"].value_counts().reset_index()
         sc.columns = ["Sentiment", "Nombre"]
-        cmap = {"Positif":"#4C8C6B","Neutre":"#C9A227","Négatif":"#B3492A"}
+        cmap = {"Positif":"#2ecc71","Neutre":"#f39c12","Négatif":"#c8102e"}
         fig = px.pie(sc, values="Nombre", names="Sentiment",
                      color="Sentiment", color_discrete_map=cmap, hole=0.4)
         fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0),
@@ -754,13 +670,13 @@ with tab2:
     if "open_cards" not in st.session_state:
         st.session_state.open_cards = {}
 
-    sentiment_colors = {"Positif": "#4C8C6B", "Neutre": "#C9A227", "Négatif": "#B3492A"}
+    sentiment_colors = {"Positif": "#2ecc71", "Neutre": "#f39c12", "Négatif": "#c8102e"}
     sentiment_labels = {"Positif": "Positif", "Neutre": "Neutre", "Négatif": "Négatif"}
 
     for i, (idx, row) in enumerate(df_reply.head(30).iterrows()):
         stars_filled = int(row["rating"])
         stars_html = "".join([
-            f'<span style="color:#C9A227;font-size:16px">★</span>' if j < stars_filled
+            f'<span style="color:#f39c12;font-size:16px">★</span>' if j < stars_filled
             else f'<span style="color:#cccccc;font-size:16px">★</span>'
             for j in range(5)
         ])
@@ -776,8 +692,8 @@ with tab2:
         comment_safe    = html_lib.escape(str(row['comment']))
 
         header_html = (
-            f'<div style="border:1px solid #ECE4D8;border-left:4px solid {sent_color};border-radius:16px;'
-            f'padding:14px 18px;margin-bottom:4px;background:#fff;box-shadow:0 4px 20px rgba(43,27,18,.06)">'
+            f'<div style="border:1px solid #eee;border-left:4px solid {sent_color};border-radius:8px;'
+            f'padding:12px 16px;margin-bottom:4px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
             f'<div><b>{store_name_safe}</b>&nbsp;&nbsp;{stars_html}&nbsp;&nbsp;'
             f'<span style="color:#888;font-size:13px">{author_safe}</span>&nbsp;'
