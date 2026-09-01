@@ -20,209 +20,178 @@ st.set_page_config(
 # ─── Branding CSS ────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Vidaloka&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vidaloka&family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-    --ink: #382F2D;
-    --muted: #8A8078;
-    --paper: #F7F6F4;
-    --surface: #FFFFFF;
-    --line: #ECE8E3;
     --red: #C10230;
     --red-dark: #93011F;
-    --gold: #F5D34E;
-    --olive: #A0AA4E;
-    --shadow: 0 6px 24px rgba(56,47,45,0.07);
-    --shadow-sm: 0 2px 10px rgba(56,47,45,0.05);
-    --radius-lg: 20px;
-    --radius-pill: 999px;
+    --black: #1A1414;
+    --white: #FFFFFF;
+    --line: #E5E1DD;
+    --grey: #8A8078;
 }
 
 html, body, [class*="css"], .stApp {
-    background-color: var(--paper) !important;
-    color: var(--ink) !important;
+    background-color: var(--white) !important;
+    color: var(--black) !important;
     font-family: 'Poppins', sans-serif !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Vidaloka', serif !important;
-    color: var(--ink) !important;
+    color: var(--black) !important;
 }
 
 p, span, div, label, li {
     font-family: 'Poppins', sans-serif !important;
-    color: var(--ink) !important;
+    color: var(--black) !important;
 }
 
 header[data-testid="stHeader"] {
-    background-color: var(--paper) !important;
-    border-bottom: none;
+    background-color: var(--white) !important;
+    border-bottom: 1px solid var(--line);
 }
 
-/* ── Sidebar : blanche, logo en haut, nav façon Vision UI clair ── */
+/* ── Sidebar : blanche, logo en haut, filtres en dessous ── */
 section[data-testid="stSidebar"] {
-    background-color: var(--surface) !important;
+    background-color: var(--white) !important;
     border-right: 1px solid var(--line);
-    box-shadow: var(--shadow-sm);
 }
 section[data-testid="stSidebar"] * {
-    color: var(--ink) !important;
+    color: var(--black) !important;
     font-family: 'Poppins', sans-serif !important;
 }
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
     font-family: 'Vidaloka', serif !important;
-    color: var(--ink) !important;
+    color: var(--black) !important;
 }
 section[data-testid="stSidebar"] hr {
     border-color: var(--line) !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="select"] > div {
-    background-color: var(--paper) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 12px !important;
+    background-color: var(--white) !important;
+    border: 1.5px solid var(--black) !important;
+    border-radius: 8px !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="select"] * {
-    color: var(--ink) !important;
-}
-section[data-testid="stSidebar"] [data-testid="stExpander"] {
-    background-color: var(--paper) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: none !important;
-}
-section[data-testid="stSidebar"] .stButton > button {
-    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: var(--radius-pill) !important;
-    box-shadow: var(--shadow-sm);
-}
-section[data-testid="stSidebar"] .stButton > button:hover {
-    box-shadow: var(--shadow);
+    color: var(--black) !important;
 }
 
-/* ── Boutons zone principale ── */
+/* ── Boutons : par défaut noir sur blanc ; actif/principal = rouge sur blanc ── */
 .stButton > button {
-    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
-    color: #ffffff !important;
-    border: none;
-    border-radius: var(--radius-pill) !important;
-    padding: 8px 22px !important;
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    border: 1.5px solid var(--black) !important;
+    border-radius: 8px !important;
+    padding: 8px 20px !important;
     font-family: 'Poppins', sans-serif !important;
     font-weight: 600 !important;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.15s ease, transform 0.1s ease;
+    box-shadow: none !important;
+    transition: all 0.15s ease;
 }
 .stButton > button:hover {
-    box-shadow: var(--shadow);
-    transform: translateY(-1px);
+    background-color: var(--black) !important;
+    color: var(--white) !important;
+    border-color: var(--black) !important;
+}
+.stButton > button[kind="primary"],
+button[data-testid="baseButton-primary"] {
+    background-color: var(--red) !important;
+    color: var(--white) !important;
+    border: 1.5px solid var(--red) !important;
+}
+.stButton > button[kind="primary"]:hover,
+button[data-testid="baseButton-primary"]:hover {
+    background-color: var(--red-dark) !important;
+    border-color: var(--red-dark) !important;
+    color: var(--white) !important;
 }
 
-/* ── Onglets en pilule, façon nav Vision UI ── */
+/* ── Onglets : actif = rouge plein + texte blanc ; inactif = texte noir ── */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 6px;
-    background: var(--surface);
-    padding: 6px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line);
-    display: inline-flex;
-    box-shadow: var(--shadow-sm);
+    gap: 4px;
+    border-bottom: 1.5px solid var(--line);
 }
 .stTabs [data-baseweb="tab"] {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 600 !important;
-    color: var(--muted) !important;
+    color: var(--black) !important;
     background-color: transparent !important;
     border: none !important;
-    border-radius: var(--radius-pill) !important;
-    padding: 8px 20px !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 10px 22px !important;
 }
 .stTabs [aria-selected="true"] {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
+    color: var(--white) !important;
+    background-color: var(--red) !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
 .stSelectbox label, .stSlider label {
-    color: var(--ink) !important;
+    color: var(--black) !important;
     font-family: 'Poppins', sans-serif !important;
 }
 .stSelectbox > div > div {
-    background-color: var(--surface) !important;
-    color: var(--ink) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: 12px !important;
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    border: 1.5px solid var(--black) !important;
+    border-radius: 8px !important;
 }
-[data-baseweb="select"] * { background-color: var(--surface) !important; color: var(--ink) !important; }
-[data-baseweb="popover"] * { background-color: var(--surface) !important; color: var(--ink) !important; }
-[role="option"]:hover { background-color: #FDF0F2 !important; }
+[data-baseweb="select"] * { background-color: var(--white) !important; color: var(--black) !important; }
+[data-baseweb="popover"] * { background-color: var(--white) !important; color: var(--black) !important; }
+[role="option"]:hover { background-color: #FBE9ED !important; }
 
 [data-testid="stExpander"] {
-    background-color: var(--surface) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow-sm);
+    background-color: var(--white) !important;
+    border: 1.5px solid var(--black) !important;
+    border-radius: 10px !important;
 }
 [data-testid="stExpander"] summary {
-    color: var(--ink) !important;
+    color: var(--black) !important;
     font-family: 'Poppins', sans-serif !important;
 }
 
 .stTextArea textarea {
     font-family: 'Poppins', sans-serif !important;
-    color: var(--ink) !important;
-    background-color: var(--surface) !important;
-    border: 1.5px solid var(--line) !important;
-    border-radius: 14px !important;
+    color: var(--black) !important;
+    background-color: var(--white) !important;
+    border: 1.5px solid var(--black) !important;
+    border-radius: 8px !important;
 }
 .stTextArea textarea:focus {
     border-color: var(--red) !important;
-    box-shadow: 0 0 0 3px rgba(193,2,48,0.10) !important;
+    box-shadow: 0 0 0 2px rgba(193,2,48,0.15) !important;
     outline: none !important;
 }
 
 hr { border-color: var(--line); }
 
-/* ── Cartes KPI façon "glass" clair, coin sup. arrondi (frame device) ── */
+/* ── Cartes KPI : sobres, accent rouge en liseré, pas de dégradé ── */
 .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 28px 28px 16px 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
+    background: var(--white);
+    border: 1.5px solid var(--black);
+    border-left: 4px solid var(--red);
+    border-radius: 10px;
+    padding: 18px;
     height: 100%;
-}
-.kpi-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 19px;
-    margin-bottom: 12px;
-    color: #ffffff;
-    background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-    box-shadow: 0 4px 12px rgba(193,2,48,0.25);
 }
 .kpi-card .kpi-label {
     font-size: 12.5px;
-    color: var(--muted);
+    color: var(--grey);
     font-weight: 500;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 .kpi-card .kpi-value {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 800;
+    font-family: 'Vidaloka', serif;
     font-size: 28px;
-    color: var(--ink);
+    color: var(--black);
     line-height: 1.1;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: var(--radius-lg) !important;
+    border-radius: 10px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -632,21 +601,7 @@ if os.path.exists("logo.png"):
     st.sidebar.image("logo.png", use_container_width=True)
 st.sidebar.markdown("---")
 
-# Diagnostic API
-with st.sidebar.expander("🔧 Tester la connexion API"):
-    if st.button("▶ Lancer le diagnostic", key="diag_btn"):
-        with st.spinner("Test en cours..."):
-            diag_results = test_api_connection()
-        for icon, step, detail in diag_results:
-            if icon == "✅":
-                st.success(f"**{step}**\n\n{detail}")
-            elif icon == "❌":
-                st.error(f"**{step}**\n\n{detail}")
-            else:
-                st.warning(f"**{step}**\n\n{detail}")
-
-st.sidebar.markdown("---")
-st.sidebar.title("🔍 Filtres")
+st.sidebar.title("Filtres")
 
 countries = sorted(set(s["country"] for s in user_stores.values()))
 sel_country = st.sidebar.selectbox("Pays", ["Tous"] + countries)
@@ -662,11 +617,6 @@ sel_store = st.sidebar.selectbox("Magasin", store_names)
 with st.spinner("Chargement des avis..."):
     df_all, is_real = load_real_data(user_stores)
 
-if is_real:
-    st.sidebar.success("✅ Données réelles Google")
-else:
-    st.sidebar.info("📊 Données de démonstration\n\nVérifiez vos secrets API pour les données réelles.")
-
 # Filter
 df_f = df_all[df_all["store_id"].isin(list(filtered_stores.keys()))].copy()
 if sel_store != "Tous":
@@ -676,10 +626,9 @@ if sel_store != "Tous":
 tab1, tab2 = st.tabs(["📊 Tableau de bord", "💬 Répondre aux avis"])
 
 with tab1:
-    def kpi_card(icon, label, value, badge_grad="linear-gradient(135deg, #C10230 0%, #F5D34E 100%)"):
+    def kpi_card(label, value):
         st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-icon" style="background:{badge_grad}">{icon}</div>
             <div class="kpi-label">{label}</div>
             <div class="kpi-value">{value}</div>
         </div>
@@ -687,17 +636,13 @@ with tab1:
 
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        kpi_card("⭐", "Note moyenne", f"{df_f['rating'].mean():.2f} / 5",
-                  "linear-gradient(135deg, #F5D34E 0%, #C10230 100%)")
+        kpi_card("Note moyenne", f"{df_f['rating'].mean():.2f} / 5")
     with k2:
-        kpi_card("💬", "Total avis", f"{len(df_f)}",
-                  "linear-gradient(135deg, #C10230 0%, #93011F 100%)")
+        kpi_card("Total avis", f"{len(df_f)}")
     with k3:
-        kpi_card("😊", "Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%",
-                  "linear-gradient(135deg, #A0AA4E 0%, #6E7736 100%)")
+        kpi_card("Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%")
     with k4:
-        kpi_card("😞", "Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%",
-                  "linear-gradient(135deg, #93011F 0%, #382F2D 100%)")
+        kpi_card("Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%")
     st.markdown("---")
 
     c1, c2 = st.columns(2)
@@ -707,7 +652,7 @@ with tab1:
         sr.columns = ["Magasin", "Note"]
         sr = sr.sort_values("Note")
         fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
-                     color="Note", color_continuous_scale=["#C10230","#F5D34E","#A0AA4E"],
+                     color="Note", color_continuous_scale=["#C10230","#8A8078","#1A1414"],
                      range_color=[1,5], range_x=[0,5])
         fig.update_layout(height=360, coloraxis_showscale=False,
                           margin=dict(l=0,r=0,t=10,b=0),
@@ -718,7 +663,7 @@ with tab1:
         st.markdown("#### Répartition des sentiments")
         sc = df_f["sentiment"].value_counts().reset_index()
         sc.columns = ["Sentiment", "Nombre"]
-        cmap = {"Positif":"#A0AA4E","Neutre":"#F5D34E","Négatif":"#C10230"}
+        cmap = {"Positif":"#1A1414","Neutre":"#8A8078","Négatif":"#C10230"}
         fig = px.pie(sc, values="Nombre", names="Sentiment",
                      color="Sentiment", color_discrete_map=cmap, hole=0.4)
         fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0),
@@ -769,13 +714,13 @@ with tab2:
     if "open_cards" not in st.session_state:
         st.session_state.open_cards = {}
 
-    sentiment_colors = {"Positif": "#A0AA4E", "Neutre": "#F5D34E", "Négatif": "#C10230"}
+    sentiment_colors = {"Positif": "#1A1414", "Neutre": "#8A8078", "Négatif": "#C10230"}
     sentiment_labels = {"Positif": "Positif", "Neutre": "Neutre", "Négatif": "Négatif"}
 
     for i, (idx, row) in enumerate(df_reply.head(30).iterrows()):
         stars_filled = int(row["rating"])
         stars_html = "".join([
-            f'<span style="color:#F5D34E;font-size:16px">★</span>' if j < stars_filled
+            f'<span style="color:#C10230;font-size:16px">★</span>' if j < stars_filled
             else f'<span style="color:#cccccc;font-size:16px">★</span>'
             for j in range(5)
         ])
@@ -791,8 +736,8 @@ with tab2:
         comment_safe    = html_lib.escape(str(row['comment']))
 
         header_html = (
-            f'<div style="border:1px solid #ECE8E3;border-left:4px solid {sent_color};border-radius:18px;'
-            f'padding:14px 18px;margin-bottom:4px;background:#fff;box-shadow:0 6px 24px rgba(56,47,45,.07)">'
+            f'<div style="border:1.5px solid #1A1414;border-left:4px solid {sent_color};border-radius:10px;'
+            f'padding:14px 18px;margin-bottom:4px;background:#fff;box-shadow:none">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
             f'<div><b>{store_name_safe}</b>&nbsp;&nbsp;{stars_html}&nbsp;&nbsp;'
             f'<span style="color:#888;font-size:13px">{author_safe}</span>&nbsp;'
