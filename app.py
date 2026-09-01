@@ -110,7 +110,7 @@ button[data-testid="baseButton-primary"]:hover {
     color: var(--white) !important;
 }
 
-/* ── Onglets : actif = rectangle arrondi, dégradé rouge, texte blanc ; inactif = texte noir, sans fond ── */
+/* ── Onglets : actif = ovale, dégradé rouge → blanc, texte blanc ; inactif = texte noir, sans fond ── */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
     border-bottom: none;
@@ -121,15 +121,18 @@ button[data-testid="baseButton-primary"]:hover {
     color: var(--black) !important;
     background-color: transparent !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 10px 22px !important;
+    border-radius: 999px !important;
+    padding: 10px 26px !important;
 }
 .stTabs [aria-selected="true"] {
     color: var(--white) !important;
-    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
-    border-radius: 10px !important;
+    background: linear-gradient(90deg, var(--red) 0%, #E8A4B4 100%) !important;
+    border-radius: 999px !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+
+/* Masque l'indicateur d'exécution Streamlit (ex: "fetch_reviews_from_api(...)") */
+[data-testid="stStatusWidget"] { display: none !important; }
 
 .stSelectbox label, .stSlider label {
     color: var(--black) !important;
@@ -279,6 +282,7 @@ def generate_ai_response(comment, sentiment, store_name):
 
 
 # ─── Google API helpers ───────────────────────────────────────────────────────
+@st.cache_data(ttl=3000)  # 50 min : un peu moins que la durée de vie du token (1h)
 def get_access_token():
     """Exchange refresh token for access token."""
     try:
@@ -390,6 +394,7 @@ def test_api_connection():
     return results
 
 
+@st.cache_data(ttl=3000)
 def get_account_id(access_token):
     """Fetch the first Google Business account ID."""
     try:
