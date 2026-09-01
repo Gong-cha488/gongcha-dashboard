@@ -590,11 +590,8 @@ if authentication_status is None:
 user_store_ids = USER_STORES.get(username, [])
 user_stores    = {k: v for k, v in STORES.items() if k in user_store_ids}
 
-# Header with logo
-col_logo, col_title, col_logout = st.columns([1, 4, 1])
-with col_logo:
-    if os.path.exists("logo.png"):
-        st.image("logo.png", width=160)
+# Header
+col_title, col_logout = st.columns([5, 1])
 with col_title:
     st.markdown("<h1 style='margin-top:10px'>Dashboard Avis Google</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#888'>Bienvenue, <b>{name}</b></p>", unsafe_allow_html=True)
