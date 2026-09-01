@@ -64,7 +64,8 @@ section[data-testid="stSidebar"] * {
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    font-family: 'Vidaloka', serif !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
     color: var(--black) !important;
 }
 section[data-testid="stSidebar"] hr {
@@ -140,8 +141,15 @@ button[data-testid="baseButton-primary"]:hover {
     border-radius: 8px !important;
 }
 [data-baseweb="select"] * { background-color: var(--white) !important; color: var(--black) !important; }
+div[data-baseweb="popover"],
+div[data-baseweb="popover"] div,
+ul[data-baseweb="menu"] {
+    background-color: var(--white) !important;
+}
 [data-baseweb="popover"] * { background-color: var(--white) !important; color: var(--black) !important; }
-[role="option"]:hover { background-color: #FBE9ED !important; }
+li[role="option"] { background-color: var(--white) !important; color: var(--black) !important; }
+li[role="option"]:hover,
+li[aria-selected="true"] { background-color: #FBE9ED !important; color: var(--black) !important; }
 
 [data-testid="stExpander"] {
     background-color: var(--white) !important;
@@ -652,7 +660,7 @@ with tab1:
         sr.columns = ["Magasin", "Note"]
         sr = sr.sort_values("Note")
         fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
-                     color="Note", color_continuous_scale=["#C10230","#8A8078","#1A1414"],
+                     color="Note", color_continuous_scale=["#C10230","#D4A017","#1E8449"],
                      range_color=[1,5], range_x=[0,5])
         fig.update_layout(height=360, coloraxis_showscale=False,
                           margin=dict(l=0,r=0,t=10,b=0),
@@ -663,7 +671,7 @@ with tab1:
         st.markdown("#### Répartition des sentiments")
         sc = df_f["sentiment"].value_counts().reset_index()
         sc.columns = ["Sentiment", "Nombre"]
-        cmap = {"Positif":"#1A1414","Neutre":"#8A8078","Négatif":"#C10230"}
+        cmap = {"Positif":"#1E8449","Neutre":"#D4A017","Négatif":"#C10230"}
         fig = px.pie(sc, values="Nombre", names="Sentiment",
                      color="Sentiment", color_discrete_map=cmap, hole=0.4)
         fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0),
@@ -714,7 +722,7 @@ with tab2:
     if "open_cards" not in st.session_state:
         st.session_state.open_cards = {}
 
-    sentiment_colors = {"Positif": "#1A1414", "Neutre": "#8A8078", "Négatif": "#C10230"}
+    sentiment_colors = {"Positif": "#1E8449", "Neutre": "#D4A017", "Négatif": "#C10230"}
     sentiment_labels = {"Positif": "Positif", "Neutre": "Neutre", "Négatif": "Négatif"}
 
     for i, (idx, row) in enumerate(df_reply.head(30).iterrows()):
