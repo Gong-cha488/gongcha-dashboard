@@ -110,10 +110,10 @@ button[data-testid="baseButton-primary"]:hover {
     color: var(--white) !important;
 }
 
-/* ── Onglets : actif = rouge plein + texte blanc ; inactif = texte noir ── */
+/* ── Onglets : actif = rectangle arrondi, dégradé rouge, texte blanc ; inactif = texte noir, sans fond ── */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 4px;
-    border-bottom: 1.5px solid var(--line);
+    gap: 8px;
+    border-bottom: none;
 }
 .stTabs [data-baseweb="tab"] {
     font-family: 'Poppins', sans-serif !important;
@@ -121,12 +121,13 @@ button[data-testid="baseButton-primary"]:hover {
     color: var(--black) !important;
     background-color: transparent !important;
     border: none !important;
-    border-radius: 8px 8px 0 0 !important;
+    border-radius: 10px !important;
     padding: 10px 22px !important;
 }
 .stTabs [aria-selected="true"] {
     color: var(--white) !important;
-    background-color: var(--red) !important;
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
+    border-radius: 10px !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
