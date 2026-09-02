@@ -193,11 +193,12 @@ hr { border-color: var(--line); }
 .kpi-card .kpi-label {
     font-size: 13px;
     color: var(--grey);
-    font-weight: 500;
+    font-weight: 700;
     margin-bottom: 4px;
 }
 .kpi-card .kpi-value {
     font-family: 'Vidaloka', serif;
+    font-weight: 700;
     font-size: 26px;
     color: var(--black);
     line-height: 1.1;
