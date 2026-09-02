@@ -758,11 +758,36 @@ with tab1:
             sc = df_f["sentiment"].value_counts().reset_index()
             sc.columns = ["Sentiment", "Nombre"]
             cmap = {"Positif":"#1E8449","Neutre":"#D4A017","Négatif":"#C10230"}
+            total_avis = sc["Nombre"].sum()
+
             fig = px.pie(sc, values="Nombre", names="Sentiment",
-                         color="Sentiment", color_discrete_map=cmap, hole=0.4)
-            fig.update_layout(height=340, margin=dict(l=0,r=0,t=10,b=0),
-                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
+                         color="Sentiment", color_discrete_map=cmap, hole=0.55)
+            fig.update_traces(textinfo="none", marker=dict(line=dict(color="white", width=2)))
+            fig.update_layout(height=190, showlegend=False,
+                              margin=dict(l=60,r=60,t=6,b=6),
+                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown("<div style='height:6px;'></div>", unsafe_allow_html=True)
+            for sent in ["Positif", "Négatif", "Neutre"]:
+                row = sc[sc["Sentiment"] == sent]
+                n = int(row["Nombre"].iloc[0]) if len(row) else 0
+                pct = (n / total_avis * 100) if total_avis else 0
+                color = cmap[sent]
+                st.markdown(f"""
+                <div style="margin-bottom:10px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; font-family:'Poppins',sans-serif;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="width:11px; height:11px; border-radius:3px; background:{color}; display:inline-block;"></span>
+                            <span style="font-size:13.5px; color:#1A1414;">{sent}</span>
+                        </div>
+                        <span style="font-size:13.5px; font-weight:700; color:#1A1414;">{pct:.1f}%</span>
+                    </div>
+                    <div style="background:#F1EEEA; border-radius:6px; height:6px; margin-top:5px; overflow:hidden;">
+                        <div style="background:{color}; width:{pct:.1f}%; height:100%; border-radius:6px;"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
     with st.container(border=True, key="chart_line"):
         st.markdown("#### Évolution de la note dans le temps")
