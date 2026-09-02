@@ -111,24 +111,25 @@ button[data-testid="baseButton-primary"]:hover {
     color: var(--white) !important;
 }
 
-/* ── Onglets : actif = ovale, dégradé rouge → blanc, texte blanc ; inactif = texte noir, sans fond ── */
+/* ── Onglets : actif = petite pilule fond rose pâle + texte rouge gras ; inactif = texte noir, sans fond ── */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 8px;
+    gap: 6px;
     border-bottom: none;
 }
 .stTabs [data-baseweb="tab"] {
     font-family: 'Poppins', sans-serif !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     color: var(--black) !important;
     background-color: transparent !important;
     border: none !important;
-    border-radius: 999px !important;
-    padding: 10px 26px !important;
+    border-radius: 8px !important;
+    padding: 6px 14px !important;
 }
 .stTabs [aria-selected="true"] {
-    color: var(--white) !important;
-    background: linear-gradient(90deg, var(--red) 0%, #E8A4B4 100%) !important;
-    border-radius: 999px !important;
+    color: var(--red) !important;
+    background-color: #FBE9ED !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
@@ -193,12 +194,11 @@ hr { border-color: var(--line); }
 .kpi-card .kpi-label {
     font-size: 13px;
     color: var(--grey);
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 4px;
 }
 .kpi-card .kpi-value {
     font-family: 'Vidaloka', serif;
-    font-weight: 700;
     font-size: 26px;
     color: var(--black);
     line-height: 1.1;
