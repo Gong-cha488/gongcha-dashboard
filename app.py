@@ -204,7 +204,17 @@ hr { border-color: var(--line); }
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 10px !important;
+    border-radius: 14px !important;
+    border: 1.5px solid var(--line) !important;
+    border-top: 3px solid var(--red) !important;
+    box-shadow: 0 8px 24px rgba(26,20,20,0.09), 0 2px 6px rgba(26,20,20,0.06) !important;
+    padding: 6px 4px !important;
+    background: var(--white) !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    box-shadow: 0 12px 32px rgba(26,20,20,0.13), 0 4px 10px rgba(26,20,20,0.08) !important;
+    transform: translateY(-2px);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -715,46 +725,49 @@ with tab1:
 
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("#### Note moyenne par magasin")
-        sr = df_f.groupby("store_name")["rating"].mean().reset_index()
-        sr.columns = ["Magasin", "Note"]
-        sr = sr.sort_values("Note")
-        fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
-                     color="Note", color_continuous_scale=["#C10230","#D4A017","#1E8449"],
-                     range_color=[1,5], range_x=[0,5])
-        fig.update_layout(height=360, coloraxis_showscale=False,
-                          margin=dict(l=0,r=0,t=10,b=0),
-                          paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
-        st.plotly_chart(fig, use_container_width=True)
+        with st.container(border=True):
+            st.markdown("#### Note moyenne par magasin")
+            sr = df_f.groupby("store_name")["rating"].mean().reset_index()
+            sr.columns = ["Magasin", "Note"]
+            sr = sr.sort_values("Note")
+            fig = px.bar(sr, x="Note", y="Magasin", orientation="h",
+                         color="Note", color_continuous_scale=["#C10230","#D4A017","#1E8449"],
+                         range_color=[1,5], range_x=[0,5])
+            fig.update_layout(height=340, coloraxis_showscale=False,
+                              margin=dict(l=0,r=0,t=10,b=0),
+                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
+            st.plotly_chart(fig, use_container_width=True)
 
     with c2:
-        st.markdown("#### Répartition des sentiments")
-        sc = df_f["sentiment"].value_counts().reset_index()
-        sc.columns = ["Sentiment", "Nombre"]
-        cmap = {"Positif":"#1E8449","Neutre":"#D4A017","Négatif":"#C10230"}
-        fig = px.pie(sc, values="Nombre", names="Sentiment",
-                     color="Sentiment", color_discrete_map=cmap, hole=0.4)
-        fig.update_layout(height=360, margin=dict(l=0,r=0,t=10,b=0),
-                          paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
-        st.plotly_chart(fig, use_container_width=True)
+        with st.container(border=True):
+            st.markdown("#### Répartition des sentiments")
+            sc = df_f["sentiment"].value_counts().reset_index()
+            sc.columns = ["Sentiment", "Nombre"]
+            cmap = {"Positif":"#1E8449","Neutre":"#D4A017","Négatif":"#C10230"}
+            fig = px.pie(sc, values="Nombre", names="Sentiment",
+                         color="Sentiment", color_discrete_map=cmap, hole=0.4)
+            fig.update_layout(height=340, margin=dict(l=0,r=0,t=10,b=0),
+                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
+            st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("#### Évolution de la note dans le temps")
-    df_f2 = df_f.copy()
-    df_f2["month"] = df_f2["date"].dt.to_period("M").astype(str)
-    if sel_store == "Tous":
-        monthly = df_f2.groupby(["month","store_name"])["rating"].mean().reset_index()
-        monthly.columns = ["Mois","Magasin","Note"]
-        fig = px.line(monthly, x="Mois", y="Note", color="Magasin", markers=True,
-                      color_discrete_sequence=["#c8102e","#3d2b1f","#f39c12","#2ecc71","#3498db","#9b59b6","#1abc9c","#e67e22","#e74c3c","#2980b9"])
-    else:
-        monthly = df_f2.groupby("month")["rating"].mean().reset_index()
-        monthly.columns = ["Mois","Note"]
-        fig = px.line(monthly, x="Mois", y="Note", markers=True,
-                      color_discrete_sequence=["#c8102e"])
-    fig.update_layout(height=360, yaxis_range=[0,5],
-                      margin=dict(l=0,r=0,t=10,b=0),
-                      paper_bgcolor="white", plot_bgcolor="white", font_color="#000000")
-    st.plotly_chart(fig, use_container_width=True)
+    with st.container(border=True):
+        st.markdown("#### Évolution de la note dans le temps")
+        df_f2 = df_f.copy()
+        df_f2["month"] = df_f2["date"].dt.to_period("M").astype(str)
+        if sel_store == "Tous":
+            monthly = df_f2.groupby(["month","store_name"])["rating"].mean().reset_index()
+            monthly.columns = ["Mois","Magasin","Note"]
+            fig = px.line(monthly, x="Mois", y="Note", color="Magasin", markers=True,
+                          color_discrete_sequence=["#c8102e","#3d2b1f","#f39c12","#2ecc71","#3498db","#9b59b6","#1abc9c","#e67e22","#e74c3c","#2980b9"])
+        else:
+            monthly = df_f2.groupby("month")["rating"].mean().reset_index()
+            monthly.columns = ["Mois","Note"]
+            fig = px.line(monthly, x="Mois", y="Note", markers=True,
+                          color_discrete_sequence=["#c8102e"])
+        fig.update_layout(height=340, yaxis_range=[0,5],
+                          margin=dict(l=0,r=0,t=10,b=0),
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
+        st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     st.markdown("#### Répondre aux avis")
