@@ -181,38 +181,40 @@ li[aria-selected="true"] { background-color: #FBE9ED !important; color: var(--bl
 
 hr { border-color: var(--line); }
 
-/* ── Cartes KPI : sobres, accent rouge en liseré, pas de dégradé ── */
+/* ── Cartes KPI : fond gris très clair, badge d'icône, ombre douce ── */
 .kpi-card {
-    background: var(--white);
-    border: 1.5px solid var(--black);
-    border-left: 4px solid var(--red);
-    border-radius: 10px;
-    padding: 18px;
+    background: #F7F5F3;
+    border: none;
+    border-radius: 16px;
+    padding: 18px 20px;
     height: 100%;
+    box-shadow: 0 2px 8px rgba(26,20,20,0.05);
 }
 .kpi-card .kpi-label {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--grey);
     font-weight: 500;
     margin-bottom: 4px;
 }
 .kpi-card .kpi-value {
     font-family: 'Vidaloka', serif;
-    font-size: 28px;
+    font-size: 26px;
     color: var(--black);
     line-height: 1.1;
+    margin-top: 10px;
 }
 
-div[data-testid="stVerticalBlockBorderWrapper"] {
+/* Cartes de graphiques : sélecteur basé sur key= (stable, cf. doc Streamlit st.container) */
+div[class*="st-key-chart_"] {
     border-radius: 14px !important;
     border: 1.5px solid var(--line) !important;
     border-top: 3px solid var(--red) !important;
     box-shadow: 0 8px 24px rgba(26,20,20,0.09), 0 2px 6px rgba(26,20,20,0.06) !important;
-    padding: 6px 4px !important;
+    padding: 10px 6px !important;
     background: var(--white) !important;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+div[class*="st-key-chart_"]:hover {
     box-shadow: 0 12px 32px rgba(26,20,20,0.13), 0 4px 10px rgba(26,20,20,0.08) !important;
     transform: translateY(-2px);
 }
@@ -704,28 +706,33 @@ if logo_b64:
 tab1, tab2 = st.tabs(["📊 Tableau de bord", "💬 Répondre aux avis"])
 
 with tab1:
-    def kpi_card(label, value):
+    def kpi_card(label, value, icon, icon_bg):
         st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">{label}</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="kpi-label">{label}</div>
+                <div style="width:34px; height:34px; border-radius:10px; background:{icon_bg};
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:15px; flex-shrink:0;">{icon}</div>
+            </div>
             <div class="kpi-value">{value}</div>
         </div>
         """, unsafe_allow_html=True)
 
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        kpi_card("Note moyenne", f"{df_f['rating'].mean():.2f} / 5")
+        kpi_card("Note moyenne", f"{df_f['rating'].mean():.2f} / 5", "⭐", "#FBE9ED")
     with k2:
-        kpi_card("Total avis", f"{len(df_f)}")
+        kpi_card("Total avis", f"{len(df_f)}", "💬", "#F1EEEA")
     with k3:
-        kpi_card("Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%")
+        kpi_card("Avis positifs", f"{(df_f['sentiment']=='Positif').mean()*100:.0f}%", "😊", "#E4F1E9")
     with k4:
-        kpi_card("Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%")
+        kpi_card("Avis négatifs", f"{(df_f['sentiment']=='Négatif').mean()*100:.0f}%", "😞", "#FBE9ED")
     st.markdown("---")
 
     c1, c2 = st.columns(2)
     with c1:
-        with st.container(border=True):
+        with st.container(border=True, key="chart_bar"):
             st.markdown("#### Note moyenne par magasin")
             sr = df_f.groupby("store_name")["rating"].mean().reset_index()
             sr.columns = ["Magasin", "Note"]
@@ -739,7 +746,7 @@ with tab1:
             st.plotly_chart(fig, use_container_width=True)
 
     with c2:
-        with st.container(border=True):
+        with st.container(border=True, key="chart_pie"):
             st.markdown("#### Répartition des sentiments")
             sc = df_f["sentiment"].value_counts().reset_index()
             sc.columns = ["Sentiment", "Nombre"]
@@ -750,7 +757,7 @@ with tab1:
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
             st.plotly_chart(fig, use_container_width=True)
 
-    with st.container(border=True):
+    with st.container(border=True, key="chart_line"):
         st.markdown("#### Évolution de la note dans le temps")
         df_f2 = df_f.copy()
         df_f2["month"] = df_f2["date"].dt.to_period("M").astype(str)
