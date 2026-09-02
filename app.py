@@ -9,6 +9,7 @@ import random
 import os
 import requests
 import html as html_lib
+import base64
 
 # ─── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -607,31 +608,87 @@ with col_logout:
 
 st.markdown("---")
 
-# Sidebar
-if os.path.exists("logo.png"):
-    st.sidebar.image("logo.png", use_container_width=True)
-st.sidebar.markdown("---")
-
-st.sidebar.title("Filtres")
-
+# Sidebar — bandeau établissement en haut, façon Malou
 countries = sorted(set(s["country"] for s in user_stores.values()))
-sel_country = st.sidebar.selectbox("Pays", ["Tous"] + countries)
+all_store_names = ["Tous"] + [v["name"] for v in user_stores.values()]
+
+st.sidebar.markdown("""
+<div style="display:flex; align-items:center; gap:8px; padding:10px 4px 4px 4px;">
+    <div style="width:26px; height:26px; border-radius:50%; background:#C10230;
+                display:flex; align-items:center; justify-content:center;
+                color:#fff; font-size:13px;">🏠</div>
+    <span style="font-weight:700; font-family:'Poppins', sans-serif; font-size:14px;">Établissement</span>
+</div>
+""", unsafe_allow_html=True)
+sel_store = st.sidebar.selectbox(
+    "Établissement", all_store_names,
+    format_func=lambda x: "Tous les établissements" if x == "Tous" else x,
+    label_visibility="collapsed",
+)
+st.sidebar.markdown("<hr style='margin:8px 0 14px 0;'>", unsafe_allow_html=True)
+
+# Menu de navigation — seul "E-réputation" est actif pour l'instant
+def _nav_item(icon, label, active=False, soon=False):
+    if active:
+        st.sidebar.markdown(f"""
+        <div style="display:flex; align-items:center; gap:10px; padding:9px 12px;
+                    border-radius:10px; background:#FBE9ED; color:#C10230;
+                    font-weight:700; font-family:'Poppins', sans-serif; font-size:14.5px; margin-bottom:2px;">
+            <span style="font-size:16px;">{icon}</span> {label}
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        soon_tag = ('<span style="margin-left:auto; font-size:10px; color:#B0A89E; '
+                    'background:#F1EEEA; padding:1px 7px; border-radius:8px;">Bientôt</span>') if soon else ""
+        st.sidebar.markdown(f"""
+        <div style="display:flex; align-items:center; gap:10px; padding:9px 12px;
+                    border-radius:10px; color:#B0A89E;
+                    font-family:'Poppins', sans-serif; font-size:14.5px; margin-bottom:2px;">
+            <span style="font-size:16px;">{icon}</span> {label} {soon_tag}
+        </div>
+        """, unsafe_allow_html=True)
+
+_nav_item("🔍", "Référencement", soon=True)
+_nav_item("⭐", "E-réputation", active=True)
+_nav_item("🚀", "Boosters", soon=True)
+_nav_item("📈", "Statistiques", soon=True)
+
+st.sidebar.markdown("<hr style='margin:14px 0;'>", unsafe_allow_html=True)
+
+with st.sidebar.expander("Filtre par pays"):
+    sel_country = st.selectbox("Pays", ["Tous"] + countries, label_visibility="collapsed")
 
 filtered_stores = user_stores
 if sel_country != "Tous":
     filtered_stores = {k: v for k, v in user_stores.items() if v["country"] == sel_country}
-
-store_names = ["Tous"] + [v["name"] for v in filtered_stores.values()]
-sel_store = st.sidebar.selectbox("Magasin", store_names)
 
 # Load data
 with st.spinner("Chargement des avis..."):
     df_all, is_real = load_real_data(user_stores)
 
 # Filter
-df_f = df_all[df_all["store_id"].isin(list(filtered_stores.keys()))].copy()
 if sel_store != "Tous":
-    df_f = df_f[df_f["store_name"] == sel_store]
+    df_f = df_all[df_all["store_name"] == sel_store].copy()
+else:
+    df_f = df_all[df_all["store_id"].isin(list(filtered_stores.keys()))].copy()
+
+# Logo Gong cha tout en bas de la sidebar
+def _logo_b64():
+    if os.path.exists("logo.png"):
+        with open("logo.png", "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return None
+
+logo_b64 = _logo_b64()
+st.sidebar.markdown("<div style='margin-top:60px;'></div>", unsafe_allow_html=True)
+if logo_b64:
+    st.sidebar.markdown(f"""
+    <div style="display:flex; align-items:center; gap:8px; padding:10px 4px;
+                border-top:1px solid #ECE8E3;">
+        <img src="data:image/png;base64,{logo_b64}" style="width:26px; height:26px; border-radius:50%; object-fit:cover;">
+        <span style="font-family:'Vidaloka', serif; font-size:15px; color:#1A1414;">Gong cha</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
 tab1, tab2 = st.tabs(["📊 Tableau de bord", "💬 Répondre aux avis"])
