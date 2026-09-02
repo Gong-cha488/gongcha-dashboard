@@ -762,8 +762,13 @@ with tab1:
 
             fig = px.pie(sc, values="Nombre", names="Sentiment",
                          color="Sentiment", color_discrete_map=cmap, hole=0.55)
-            fig.update_traces(textinfo="none", marker=dict(line=dict(color="white", width=2)))
-            fig.update_layout(height=190, showlegend=False,
+            fig.update_traces(
+                textinfo="percent", textposition="inside",
+                texttemplate="<b>%{percent:.1%}</b>",
+                textfont=dict(color="white", size=15, family="Poppins"),
+                marker=dict(line=dict(color="white", width=2)),
+            )
+            fig.update_layout(height=280, showlegend=False,
                               margin=dict(l=60,r=60,t=6,b=6),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
