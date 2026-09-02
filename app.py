@@ -123,13 +123,19 @@ button[data-testid="baseButton-primary"]:hover {
     background-color: transparent !important;
     border: none !important;
     border-radius: 8px !important;
-    padding: 6px 14px !important;
+    padding: 11px 26px !important;
 }
 .stTabs [aria-selected="true"] {
     color: var(--red) !important;
     background-color: #FBE9ED !important;
     font-weight: 700 !important;
     border-radius: 8px !important;
+}
+.stTabs [aria-selected="true"] p,
+.stTabs [aria-selected="true"] div,
+.stTabs [aria-selected="true"] span {
+    font-weight: 700 !important;
+    color: var(--red) !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
