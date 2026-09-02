@@ -768,19 +768,46 @@ with tab1:
         st.markdown("#### Évolution de la note dans le temps")
         df_f2 = df_f.copy()
         df_f2["month"] = df_f2["date"].dt.to_period("M").astype(str)
+
         if sel_store == "Tous":
             monthly = df_f2.groupby(["month","store_name"])["rating"].mean().reset_index()
             monthly.columns = ["Mois","Magasin","Note"]
             fig = px.line(monthly, x="Mois", y="Note", color="Magasin", markers=True,
-                          color_discrete_sequence=["#c8102e","#3d2b1f","#f39c12","#2ecc71","#3498db","#9b59b6","#1abc9c","#e67e22","#e74c3c","#2980b9"])
+                          line_shape="spline",
+                          color_discrete_sequence=["#C10230","#1A1414","#D4A017","#1E8449","#3498db","#9b59b6","#1abc9c","#e67e22","#8e44ad","#2980b9"])
+            fig.update_traces(line=dict(width=3.5), marker=dict(size=7, line=dict(width=1.5, color="white")))
+            fig.update_layout(
+                legend=dict(orientation="h", yanchor="bottom", y=1.04, xanchor="left", x=0,
+                            font=dict(size=13, family="Poppins", color="#1A1414"), title=None,
+                            bgcolor="rgba(0,0,0,0)"),
+            )
         else:
             monthly = df_f2.groupby("month")["rating"].mean().reset_index()
             monthly.columns = ["Mois","Note"]
-            fig = px.line(monthly, x="Mois", y="Note", markers=True,
-                          color_discrete_sequence=["#c8102e"])
-        fig.update_layout(height=340, yaxis_range=[0,5],
-                          margin=dict(l=0,r=0,t=10,b=0),
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#000000")
+            fig = px.line(monthly, x="Mois", y="Note", markers=True, line_shape="spline",
+                          color_discrete_sequence=["#C10230"])
+            fig.update_traces(
+                line=dict(width=3.5), marker=dict(size=7, line=dict(width=1.5, color="white")),
+                fill="tozeroy", fillcolor="rgba(193,2,48,0.08)",
+            )
+            if len(monthly) > 0:
+                last = monthly.iloc[-1]
+                fig.add_annotation(
+                    x=last["Mois"], y=last["Note"],
+                    text=f"<b>{last['Note']:.2f}</b>",
+                    showarrow=True, arrowhead=0, ax=0, ay=-32,
+                    bgcolor="#C10230", font=dict(color="white", size=13, family="Poppins"),
+                    bordercolor="#C10230", borderwidth=0, borderpad=6,
+                )
+
+        fig.update_layout(
+            height=340, yaxis_range=[0,5.4],
+            margin=dict(l=0,r=0,t=44 if sel_store == "Tous" else 30, b=0),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(family="Poppins", color="#1A1414", size=12.5),
+        )
+        fig.update_xaxes(showgrid=False, showline=True, linecolor="#ECE8E3", ticks="")
+        fig.update_yaxes(showgrid=True, gridcolor="#F1EEEA", gridwidth=1, zeroline=False, ticks="")
         st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
